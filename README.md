@@ -2,7 +2,7 @@ Ethers Extension: LedgerSigner
 ==============================
 
 A **LedgerSigner** connects to a [Ledger Hardware Wallet](https://www.ledger.com)
-over some transport, and allows all normal Signer operations
+over some transport, and allows all normal [Signer operations](https://docs.ethers.org/v6/api/providers/#Signer)
 protected by the hardware wallet.
 
 
