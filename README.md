@@ -76,6 +76,13 @@ default path (account #0) is returned, if a number is provided,
 the HD path for that account is returned, otherwise a valid HD path
 is expected (starting with `m/`).
 
+
+Notes
+-----
+
+- Some platforms, such as [MetaMask](https://metamask.io) use a different derivation path for accounts. For those, you can use the Ethers [getIndexedAccount function](https://docs.ethers.org/v6/api/wallet/#getIndexedAccountPath).
+
+
 License
 -------
 
