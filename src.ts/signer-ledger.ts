@@ -1,6 +1,7 @@
 import {
     AbstractSigner, assertArgument, copyRequest, getAccountPath,
-    getAddress, resolveAddress, resolveProperties, Transaction
+    getAddress, hexlify, resolveAddress, resolveProperties,
+    Signature, Transaction, toUtf8Bytes
 } from "ethers";
 
 //import { ledgerService } from "@ledgerhq/hw-app-eth"
@@ -72,8 +73,6 @@ export class LedgerSigner extends AbstractSigner {
             if (to != null) { _tx.to = to; }
             if (from != null) { _tx.from = from; }
 
-            const transport = await this.#transport;
-
             const tx = Transaction.from(<TransactionLike<string>>_tx);
             const rawTx = tx.unsignedSerialized.substring(2);
 
@@ -85,13 +84,19 @@ export class LedgerSigner extends AbstractSigner {
                 nfts: [ ],
                 erc20Tokens: [ ]
             };
+
+            // Ask the Ledger to sign for us
+            const transport = await this.#transport;
             const obj = await (new (Eth as any)(transport)).signTransaction(this.#path, rawTx, resolution);
-            console.log("OBJ", obj)
-            tx.signature = {
-              v: `0x${ obj.v }`,
-              r: `0x${ obj.r }`,
-              s: `0x${ obj.s }`,
-            };
+
+            // Normalize the signature for Ethers
+            obj.v = "0x" + obj.v;
+            obj.r = "0x" + obj.r;
+            obj.s = "0x" + obj.s;
+
+            // Update the transaction with the signature
+            tx.signature = obj;
+
             return tx.serialized;
         } catch (error: any) {
             throw error;
@@ -99,7 +104,21 @@ export class LedgerSigner extends AbstractSigner {
     }
 
     async signMessage(message: string | Uint8Array): Promise<string> {
-        throw new Error("Not implemented");
+        if (typeof(message) === "string") { message = toUtf8Bytes(message); }
+
+        try {
+            const transport = await this.#transport;
+            const obj = await (new (Eth as any)(transport)).signPersonalMessage(this.#path, hexlify(message).substring(2));
+
+            // Normalize the signature for Ethers
+            obj.r = "0x" + obj.r;
+            obj.s = "0x" + obj.s;
+
+            // Serialize the signature
+            return Signature.from(obj).serialized;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async signTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string> {
