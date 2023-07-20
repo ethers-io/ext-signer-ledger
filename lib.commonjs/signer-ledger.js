@@ -1,12 +1,16 @@
-import { AbstractSigner, assertArgument, copyRequest, getAccountPath, getAddress, hexlify, resolveAddress, resolveProperties, Signature, Transaction, toUtf8Bytes } from "ethers";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LedgerSigner = void 0;
+const tslib_1 = require("tslib");
+const ethers_1 = require("ethers");
 //import { ledgerService } from "@ledgerhq/hw-app-eth"
-import _Eth from "@ledgerhq/hw-app-eth";
-const Eth = ("default" in _Eth) ? _Eth.default : _Eth;
-export class LedgerSigner extends AbstractSigner {
+const hw_app_eth_1 = tslib_1.__importDefault(require("@ledgerhq/hw-app-eth"));
+const Eth = ("default" in hw_app_eth_1.default) ? hw_app_eth_1.default.default : hw_app_eth_1.default;
+class LedgerSigner extends ethers_1.AbstractSigner {
     #transport;
     #path;
     constructor(transport, provider, path) {
-        assertArgument(transport && (typeof (transport) == "object" || typeof (transport) == "function"), "invalid transport", "transport", transport);
+        (0, ethers_1.assertArgument)(transport && (typeof (transport) == "object" || typeof (transport) == "function"), "invalid transport", "transport", transport);
         super(provider);
         // Dereference package imports that use the default export
         if ("default" in transport) {
@@ -30,7 +34,7 @@ export class LedgerSigner extends AbstractSigner {
         try {
             const transport = await this.#transport;
             const obj = await (new Eth(transport)).getAddress(this.#path);
-            return getAddress(obj.address);
+            return (0, ethers_1.getAddress)(obj.address);
         }
         catch (error) {
             if (error.statusCode === 27404) {
@@ -44,10 +48,10 @@ export class LedgerSigner extends AbstractSigner {
     async signTransaction(_tx) {
         try {
             // Replace any Addressable or ENS name with an address
-            _tx = copyRequest(_tx);
-            const { to, from } = await resolveProperties({
-                to: (_tx.to ? resolveAddress(_tx.to, this.provider) : undefined),
-                from: (_tx.from ? resolveAddress(_tx.from, this.provider) : undefined)
+            _tx = (0, ethers_1.copyRequest)(_tx);
+            const { to, from } = await (0, ethers_1.resolveProperties)({
+                to: (_tx.to ? (0, ethers_1.resolveAddress)(_tx.to, this.provider) : undefined),
+                from: (_tx.from ? (0, ethers_1.resolveAddress)(_tx.from, this.provider) : undefined)
             });
             if (to != null) {
                 _tx.to = to;
@@ -55,7 +59,7 @@ export class LedgerSigner extends AbstractSigner {
             if (from != null) {
                 _tx.from = from;
             }
-            const tx = Transaction.from(_tx);
+            const tx = ethers_1.Transaction.from(_tx);
             const rawTx = tx.unsignedSerialized.substring(2);
             //const resolution = await ledgerService.resolveTransaction(rawTx);
             const resolution = {
@@ -82,16 +86,16 @@ export class LedgerSigner extends AbstractSigner {
     }
     async signMessage(message) {
         if (typeof (message) === "string") {
-            message = toUtf8Bytes(message);
+            message = (0, ethers_1.toUtf8Bytes)(message);
         }
         try {
             const transport = await this.#transport;
-            const obj = await (new Eth(transport)).signPersonalMessage(this.#path, hexlify(message).substring(2));
+            const obj = await (new Eth(transport)).signPersonalMessage(this.#path, (0, ethers_1.hexlify)(message).substring(2));
             // Normalize the signature for Ethers
             obj.r = "0x" + obj.r;
             obj.s = "0x" + obj.s;
             // Serialize the signature
-            return Signature.from(obj).serialized;
+            return ethers_1.Signature.from(obj).serialized;
         }
         catch (error) {
             throw error;
@@ -105,9 +109,10 @@ export class LedgerSigner extends AbstractSigner {
             path = 0;
         }
         if (typeof (path) === "number") {
-            return getAccountPath(path);
+            return (0, ethers_1.getAccountPath)(path);
         }
         return path;
     }
 }
+exports.LedgerSigner = LedgerSigner;
 //# sourceMappingURL=signer-ledger.js.map

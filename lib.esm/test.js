@@ -6,5 +6,7 @@ import { LedgerSigner } from "./signer-ledger.js";
     const transport = BluetoothTransport; //.default.create();
     const signer = new LedgerSigner(transport, provider);
     console.log(await signer.getAddress());
+    console.log(await signer.signTransaction({ to: signer, type: 2, chainId: 42 }));
+    //console.log(await signer.signMessage("Hello World"));
 })();
 //# sourceMappingURL=test.js.map
