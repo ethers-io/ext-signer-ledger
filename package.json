@@ -3,7 +3,7 @@
   "version": "6.0.0-beta.1",
   "description": "Ethers Signer for Ledger Hardware Wallet.",
   "dependencies": {
-    "@ledgerhq/hw-app-eth": "^6.34.0",
+    "@ledgerhq/hw-app-eth": "6.33.0",
     "ethers": "^6.6.0"
   },
   "devDependencies": {
