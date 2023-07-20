@@ -1,11 +1,11 @@
 {
-  "author": "Richard Moore <me@ricmoo.com>",
+  "name": "@ethers-ext/signer-ledger",
+  "version": "6.0.0-beta.1",
+  "description": "Ethers Signer for Ledger Hardware Wallet.",
   "dependencies": {
-    "@ledgerhq/evm-tools": "^1.0.1",
     "@ledgerhq/hw-app-eth": "^6.34.0",
     "ethers": "^6.6.0"
   },
-  "description": "Ethers Signer for Ledger Hardware Wallet.",
   "devDependencies": {
     "@ledgerhq/hw-transport-node-ble": "^6.27.17",
     "@ledgerhq/hw-transport-node-hid": "^6.27.18",
@@ -18,44 +18,47 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "ethereum": "donations.ethers.eth",
   "exports": {
     ".": {
       "import": "./lib.esm/index.js",
       "default": "./lib.commonjs/index.js"
     }
   },
+  "ethereum": "donations.ethers.eth",
   "funding": [
     {
       "type": "individual",
       "url": "https://github.com/sponsors/ethers-io"
     }
   ],
-  "keywords": [
-    "ethers",
-    "ethereum",
-    "ledger"
-  ],
-  "license": "MIT",
-  "main": "./lib.commonjs/index.js",
-  "module": "./lib.esm/index.js",
-  "name": "@ethers-ext/signer-ledger",
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/ethers-io/signer-ledger.git"
-  },
   "scripts": {
     "auto-build": "npm run build -- -w",
-    "build": "tsc --project tsconfig.esm.json",
+    "build": "tsc --build ./tsconfig.esm.json",
     "build-all": "npm run build && npm run build-commonjs",
     "build-clean": "npm run clean && npm run build-all",
     "build-commonjs": "tsc --build ./tsconfig.commonjs.json",
     "clean": "rm -rf lib.commonjs lib.esm && cp -r misc/basedirs/* .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "main": "./lib.commonjs/index.js",
+  "module": "./lib.esm/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": false,
-  "version": "6.0.0-beta.1"
+  "keywords": [
+    "ethers",
+    "ethereum",
+    "ledger"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ethers-io/signer-ledger.git"
+  },
+  "bugs": {
+    "url": "http://github.com/ethers-io/ext-signer-ledger/issues",
+    "email": "github@ricmoo.com"
+  },
+  "author": "Richard Moore <me@ricmoo.com>",
+  "license": "MIT"
 }
