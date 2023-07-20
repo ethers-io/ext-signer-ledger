@@ -64,6 +64,11 @@ import HIDTransport from "@ledgerhq/hw-transport-node-hid";
 const signer = new LedgerSigner(HIDTransport, provider);
 ```
 
+### `signer.getSigner(pathOrAccount?) => LedgerSigner`
+
+Returns a new Signer with the same transport and provider, but
+with using the `pathOrAccount`.
+
 ### `LedgerSigner.getPath(pathOrAccount?) => string`
 
 Returns the HD path for `pathOrAccount`. If none is provided, the
