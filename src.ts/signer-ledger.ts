@@ -1,12 +1,16 @@
 import {
-    AbstractSigner, assertArgument, getAccountPath, getAddress
+    AbstractSigner, assertArgument, copyRequest, getAccountPath,
+    getAddress, resolveAddress, resolveProperties, Transaction
 } from "ethers";
+
+//import { ledgerService } from "@ledgerhq/hw-app-eth"
 
 import _Eth from "@ledgerhq/hw-app-eth";
 const Eth: any = ("default" in _Eth) ? _Eth.default: _Eth;
 
 import type {
-    Provider, TypedDataDomain, TypedDataField, TransactionRequest
+    Provider, TypedDataDomain, TypedDataField, TransactionRequest,
+    TransactionLike
 } from "ethers";
 
 
@@ -55,8 +59,43 @@ export class LedgerSigner extends AbstractSigner {
         }
     }
 
-    async signTransaction(tx: TransactionRequest): Promise<string> {
-        throw new Error("Not implemented");
+    async signTransaction(_tx: TransactionRequest): Promise<string> {
+        try {
+
+            // Replace any Addressable or ENS name with an address
+            _tx = copyRequest(_tx);
+            const { to, from } = await resolveProperties({
+                to: (_tx.to ? resolveAddress(_tx.to, this.provider): undefined),
+                from: (_tx.from ? resolveAddress(_tx.from, this.provider): undefined)
+            });
+
+            if (to != null) { _tx.to = to; }
+            if (from != null) { _tx.from = from; }
+
+            const transport = await this.#transport;
+
+            const tx = Transaction.from(<TransactionLike<string>>_tx);
+            const rawTx = tx.unsignedSerialized.substring(2);
+
+            //const resolution = await ledgerService.resolveTransaction(rawTx);
+            const resolution = {
+                domains: [ ],
+                plugin: [ ],
+                externalPlugin: [ ],
+                nfts: [ ],
+                erc20Tokens: [ ]
+            };
+            const obj = await (new (Eth as any)(transport)).signTransaction(this.#path, rawTx, resolution);
+            console.log("OBJ", obj)
+            tx.signature = {
+              v: `0x${ obj.v }`,
+              r: `0x${ obj.r }`,
+              s: `0x${ obj.s }`,
+            };
+            return tx.serialized;
+        } catch (error: any) {
+            throw error;
+        }
     }
 
     async signMessage(message: string | Uint8Array): Promise<string> {
